@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: retaildb-container
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "521478963"
+      POSTGRES_DB: "retaildb"
+    ports:
+      - "5432:5432"
+    volumes:
+      - retail_pg_data:/var/lib/postgresql/retail/data
+    restart: unless-stopped
+volumes:
+  retail_pg_data:
