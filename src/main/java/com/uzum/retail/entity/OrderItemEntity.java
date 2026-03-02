@@ -3,15 +3,15 @@ package com.uzum.retail.entity;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
 @Entity
+@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
 @Table(name = "order_items")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderItemEntity {

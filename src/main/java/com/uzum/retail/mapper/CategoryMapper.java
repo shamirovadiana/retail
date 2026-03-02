@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
 
 @Mapper(componentModel = "spring")
 public interface CategoryMapper {
@@ -14,4 +15,5 @@ public interface CategoryMapper {
     CategoryEntity toEntity(CategoryRequest request);
 
     CategoryResponse toDto(CategoryEntity entity);
+    //PagedModel<CategoryResponse> toDto(PagedModel<CategoryEntity> pageOfEntities, Pageable pageable);
 }

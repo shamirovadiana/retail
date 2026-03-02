@@ -2,9 +2,7 @@ package com.uzum.retail.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,6 +15,9 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
 @Table(name = "orders")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderEntity {
@@ -39,7 +40,7 @@ public class OrderEntity {
             joinColumns = { @JoinColumn(name="order_id")},
             inverseJoinColumns = {@JoinColumn(name="order_item_id")}
     )
-    @OneToMany
+    @OneToMany(mappedBy = "order_id", cascade = CascadeType.ALL, orphanRemoval = true)
     List<OrderItemEntity> items = new ArrayList<>();
 
     @NotNull

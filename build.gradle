@@ -54,11 +54,35 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
+// Source: https://mvnrepository.com/artifact/org.mockito/mockito-core
+    implementation 'org.mockito:mockito-core:5.22.0'
+// Source: https://mvnrepository.com/artifact/org.mockito/mockito-core
+    testImplementation 'org.mockito:mockito-core:5.22.0'
+    // Source: https://mvnrepository.com/artifact/org.mockito/mockito-core
+    runtimeOnly 'org.mockito:mockito-core:5.22.0'
+    // Source: https://mvnrepository.com/artifact/org.mockito/mockito-junit-jupiter
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.22.0'
+    //mock external APIs
+    testImplementation 'org.wiremock:wiremock:3.13.2'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+
+    //core tests
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+
+    //containers
+//    testImplementation 'org.testcontainers:postgresql'
+    //testImplementation 'org.testcontainers:junit-jupiter'
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+test {
+    jvmArgs "-javaagent:${configurations.testRuntimeClasspath.find { it.name.contains("byte-buddy-agent") }.canonicalPath}"
 }

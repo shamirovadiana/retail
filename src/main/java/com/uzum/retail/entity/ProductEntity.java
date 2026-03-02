@@ -2,15 +2,16 @@ package com.uzum.retail.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 
 @Getter
 @Setter
 @Entity
+@RequiredArgsConstructor
+@Builder
+@AllArgsConstructor
 @Table(name = "products")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ProductEntity {
