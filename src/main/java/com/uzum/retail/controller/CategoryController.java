@@ -11,7 +11,7 @@ public interface CategoryController {
 
     ResponseEntity<CategoryResponse> createCategory(CategoryRequest categoryRequest);
 
-    Page<CategoryResponse> getCategories(Pageable pageable);
+    ResponseEntity<Page<CategoryResponse>> getCategories(int page, int size);
 
     ResponseEntity<CategoryResponse> getCategory(Long id);
 

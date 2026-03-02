@@ -37,6 +37,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(CategoryControllerImpl.class)
@@ -53,36 +54,54 @@ public class CategoryControllerTest {
     @MockitoBean
     private CategoryRepository categoryRepository;
 
-    static Stream<Arguments> pageableSource(){
-        return Stream.of(arguments(PageRequest.of(0,2)));
-    }
-    @ParameterizedTest
-    @MethodSource("pageableSource")
+    @Test
     @DisplayName("Test getAllCategories - Validation happy flow")
-    void getAllCategories_ShouldReturnPageOfCategories(Pageable pageable) throws Exception{
-//        CategoryEntity category1 = new CategoryEntity(1L, "Dresses");
-//        CategoryEntity category2 = new CategoryEntity(4L, "Shirts");
-//        categoryRepository.save(category1);
-//        categoryRepository.save(category2);
-//
-//
-//        CategoryResponse response1 = categoryMapper.toDto(category1);
-//        CategoryResponse response2 = categoryMapper.toDto(category2);
+    void getAllCategories_ShouldReturnPageOfCategories() throws Exception{
+        CategoryResponse response1 = new CategoryResponse(5L);
+        CategoryResponse response2 = new CategoryResponse(6L);
+        Page<CategoryResponse> page = new PageImpl<>(
+                List.of(response1, response2),
+                Pageable.ofSize(10),1);
 
-//        CategoryResponse response1 = new CategoryResponse(5L);
-//        CategoryResponse response2 = new CategoryResponse(6L);
-//        Page<CategoryResponse> page = new PageImpl<>(List.of(response1, response2));
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        when(categoryService.getAllCategories(pageable)).thenReturn(page);
-//
-//        mockMvc.perform(get("/api/categories/get-categories")
-//                .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(content().json(objectMapper.convertValue(page, String.class)));
-//
-//
-//        Mockito.verify(categoryService, Mockito.times(1)).getAllCategories(pageable);
+        ObjectMapper objectMapper = new ObjectMapper();
+        when(categoryService.getAllCategories(PageRequest.of(0,2))).thenReturn(page);
 
+        String res = objectMapper.writeValueAsString(page);
 
+        mockMvc.perform(
+                get("/api/categories/get-categories" )
+                        .param("page", "0")
+                        .param("size","2")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().json(res))
+                .andDo(print());
+
+        Mockito.verify(categoryService, Mockito.times(1)).getAllCategories(PageRequest.of(0,2));
     }
+
+//    @Test
+//    @DisplayName("Test getAllCategories - empty page")
+//    void getAllCategories_ShouldReturnEmptyPageOfCategories() throws Exception{
+//        when(categoryService.getAllCategories(PageRequest.of(0,2))).thenReturn(Page.empty());
+//
+//        Page<CategoryResponse> page = new PageImpl<>(List.of(), Pageable.ofSize(1),0);
+//        ObjectMapper objectMapper = new ObjectMapper();
+//
+//        String result = objectMapper.writeValueAsString(page);
+//
+//        mockMvc.perform(
+//                        get("/api/categories/get-categories" )
+//                                .param("page", "0")
+//                                .param("size","2")
+//                                .contentType(MediaType.APPLICATION_JSON))
+//                .andDo(print())
+//                .andExpect(status().isOk())
+//                .andExpect(content().json(result))
+//                .andDo(print());
+//
+//        Mockito.verify(categoryService, Mockito.times(1)).getAllCategories(PageRequest.of(0,2));
+//    }
+
 }
