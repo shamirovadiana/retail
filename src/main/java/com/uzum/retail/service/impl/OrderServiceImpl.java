@@ -35,7 +35,8 @@ public class OrderServiceImpl implements OrderService {
 
         OrderEntity orderEntity = orderMapper.toEntity(request);
         orderEntity.setTotalPrice(totalPrice);
-
+        orderEntity.setCreatedAt(LocalDateTime.now());
+        orderEntity.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(orderEntity);
 
         return orderMapper.toDto(orderEntity);

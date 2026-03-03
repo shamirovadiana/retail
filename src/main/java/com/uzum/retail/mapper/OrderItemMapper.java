@@ -12,6 +12,7 @@ import java.util.List;
 public interface OrderItemMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "productEntity.id", source = "productId")
+    //@Mapping(target = "orderEntity.id", source ="orderId")
     OrderItemEntity toEntity(OrderItemRequest request);
 
     @Mapping(target = "productId", source = "productEntity.id")

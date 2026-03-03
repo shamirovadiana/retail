@@ -45,3 +45,12 @@ CREATE TABLE IF NOT EXISTS "orders_items"(
   FOREIGN KEY ("order_item_id") REFERENCES order_items("id"),
   FOREIGN KEY ("order_id")  REFERENCES orders("id")
 );
+DROP TABLE IF EXISTS "orders_items";
+ALTER TABLE "order_items" ADD COLUMN "order_id" BIGINT;
+CREATE TABLE IF NOT EXISTS "orders_items"(
+                                             "order_id"   BIGINT  PRIMARY KEY ,
+                                             "order_item_id"    BIGINT,
+                                             FOREIGN KEY ("order_item_id") REFERENCES order_items("id"),
+                                             FOREIGN KEY ("order_id")  REFERENCES orders("id")
+);
+ALTER TABLE "orders_items" ALTER COLUMN "order_item_id" SET NOT NULL;

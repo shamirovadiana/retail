@@ -40,7 +40,7 @@ public class OrderEntity {
             joinColumns = { @JoinColumn(name="order_id")},
             inverseJoinColumns = {@JoinColumn(name="order_item_id")}
     )
-    @OneToMany(mappedBy = "order_id", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     List<OrderItemEntity> items = new ArrayList<>();
 
     @NotNull

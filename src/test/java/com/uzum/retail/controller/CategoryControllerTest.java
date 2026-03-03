@@ -3,11 +3,14 @@ package com.uzum.retail.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.common.Json;
 import com.uzum.retail.controller.impl.CategoryControllerImpl;
+import com.uzum.retail.dto.request.CategoryRequest;
 import com.uzum.retail.dto.response.CategoryResponse;
 import com.uzum.retail.entity.CategoryEntity;
+import com.uzum.retail.exception.CategoryNotFoundException;
 import com.uzum.retail.mapper.CategoryMapper;
 import com.uzum.retail.repository.CategoryRepository;
 import com.uzum.retail.service.impl.CategoryServiceImpl;
+import jakarta.validation.constraints.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.Parameter;
@@ -31,12 +34,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.Optional;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.params.provider.Arguments.arguments;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -104,4 +106,101 @@ public class CategoryControllerTest {
 //        Mockito.verify(categoryService, Mockito.times(1)).getAllCategories(PageRequest.of(0,2));
 //    }
 
+    @Test
+    @DisplayName("Test getCategoryById - Validation happy flow")
+    void getCategoryById_ShouldReturnCategoryResponse_WhenCategoryExists() throws Exception{
+        Long categoryId = 1L;
+        CategoryResponse categoryResponse = new CategoryResponse(1L);
+
+        when(categoryService.getById(categoryId)).thenReturn(categoryResponse);
+
+        mockMvc.perform(get("/api/categories/{id}", categoryId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value("1"));
+
+        Mockito.verify(categoryService, Mockito.times(1)).getById(categoryId);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {1,2})
+    @DisplayName("Test getCategoryById - Validation category not found")
+    void getCategoryById_ShouldReturnNotFound_WhenCategoryDoesNotExist(@NotNull Long categoryId) throws Exception{
+        when(categoryService.getById(categoryId)).thenThrow(new CategoryNotFoundException(categoryId.toString()));
+
+        mockMvc.perform(get("/api/categories/{id}", categoryId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        Mockito.verify(categoryService, Mockito.times(1)).getById(categoryId);
+    }
+
+    @Test
+    @DisplayName("Test updateCategory - Validation happy flow")
+    void updateCategory_ShouldReturnCategoryResponse_WhenCategoryExists() throws Exception{
+        Long categoryId = 1L;
+        CategoryRequest categoryRequest = new CategoryRequest("updatedCategoryName");
+        CategoryResponse categoryResponse = new CategoryResponse(1L);
+
+        when(categoryService.getById(categoryId)).thenReturn(categoryResponse);
+
+        when(categoryService.update(categoryId, categoryRequest)).thenReturn(categoryResponse);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestJson = objectMapper.writeValueAsString(categoryRequest);
+
+        mockMvc.perform(put("/api/categories/{id}", categoryId)
+                        .content(requestJson)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Mockito.verify(categoryService, Mockito.times(1)).update(categoryId, categoryRequest);
+    }
+
+    @Test
+    @DisplayName("Test updateCategory - Validation category not found")
+    void updateCategory_ShouldReturnNotFound_WhenCategoryDoesNotExist() throws Exception{
+        Long categoryId = 1L;
+        CategoryRequest categoryRequest = new CategoryRequest("updatedCategoryName");
+
+        when(categoryService.getById(categoryId)).thenThrow(new CategoryNotFoundException(categoryId.toString()));
+
+        when(categoryService.update(categoryId, categoryRequest)).thenThrow(new CategoryNotFoundException(categoryId.toString()));
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestJson = objectMapper.writeValueAsString(categoryRequest);
+
+        mockMvc.perform(put("/api/categories/{id}", categoryId)
+                        .content(requestJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Test deleteCategory - Validation happy flow")
+    void deleteCategory_ShouldReturnNoResponse_WhenCategoryDoesNotExist() throws Exception{
+        Long categoryId = 1L;
+        CategoryResponse categoryResponse = new CategoryResponse(1L);
+
+        when(categoryService.getById(categoryId)).thenReturn(categoryResponse);
+
+        mockMvc.perform(delete("/api/categories/{id}", categoryId)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Mockito.verify(categoryService, Mockito.times(1)).delete(categoryId);
+    }
+
+//    @Test
+//    @DisplayName("Test deleteCategory - Validation category not found")
+//    void deleteCategory_ShouldReturnNotFound_WhenCategoryDoesNotExist() throws Exception{
+//        Long categoryId = 1L;
+//
+//        when(categoryService.getById(categoryId)).thenThrow(new CategoryNotFoundException(categoryId.toString()));
+//
+//        mockMvc.perform(delete("/api/categories/{id}", categoryId)
+//                .contentType(MediaType.APPLICATION_JSON))
+//                        .andExpect(status().isNotFound());
+//
+//        Mockito.verify(categoryService, Mockito.times(1)).delete(categoryId);
+//    }
 }
